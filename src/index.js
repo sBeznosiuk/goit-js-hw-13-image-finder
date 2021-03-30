@@ -5,21 +5,16 @@ const debounce = require('lodash.debounce');
 
 const formRef = document.querySelector('#search-form input');
 const galleryRef = document.querySelector('.gallery');
-const loadMoreButtonRef = document.querySelector('#load-more');
-
-let loadMoreButton = (loadMoreButtonRef.disabled = true);
+const bodyRef = document.querySelector('body');
 
 formRef.addEventListener(
   'input',
   debounce(e => {
     firstPageImages();
-    handleLoadMoreButton.enable();
+    buttonRender();
+    console.log(handleImageLoad);
   }, 500),
 );
-
-loadMoreButtonRef.addEventListener('click', () => {
-  fetchData();
-});
 
 const handleImageLoad = {
   searchQuery: '',
@@ -35,14 +30,15 @@ const handleImageLoad = {
     return fetch(url, options)
       .then(res => res.json())
       .then(({ hits }) => {
-        this.incrementPage;
+        this.incrementPage();
         return hits;
       })
-      .then(updateMarkup);
+      .then(updateMarkup)
+      .then(console.log(url));
   },
 
   incrementPage() {
-    this.page++;
+    this.page += 1;
   },
 
   resetPage() {
@@ -58,29 +54,15 @@ const handleImageLoad = {
   },
 };
 
-const handleLoadMoreButton = {
-  enable() {
-    loadMoreButton = loadMoreButtonRef.disabled = false;
-  },
-
-  disable() {
-    loadMoreButton = loadMoreButtonRef.disabled = true;
-  },
-};
-
 function firstPageImages(event) {
   handleImageLoad.query = formRef.value;
   clearMarkup();
   handleImageLoad.resetPage();
-  fetchData();
+  handleImageLoad.fetchData();
 
   if (!formRef.value) {
     return;
   }
-}
-
-function fetchData() {
-  handleImageLoad.fetchData().then(updateMarkup);
 }
 
 function updateMarkup(data) {
@@ -91,4 +73,22 @@ function updateMarkup(data) {
 
 function clearMarkup() {
   galleryRef.innerHTML = '';
+}
+
+function buttonRender() {
+  const buttonRef = document.createElement('button');
+  buttonRef.textContent = 'Load more...';
+  buttonRef.setAttribute('id', 'load-more');
+
+  if (bodyRef.querySelector('#load-more')) {
+    bodyRef.appendChild(buttonRef);
+    bodyRef.removeChild(buttonRef);
+  } else {
+    bodyRef.appendChild(buttonRef);
+  }
+  console.log(bodyRef.children.prototype);
+
+  buttonRef.addEventListener('click', () => {
+    handleImageLoad.fetchData();
+  });
 }
